@@ -31,3 +31,7 @@ func setCheckRouter(router *mux.Router, checkService service.CheckService) {
 	router.Methods(http.MethodGet).Path("/check/mysql").Handler(handler.CheckMysql(checkService))
 	router.Methods(http.MethodGet).Path("/check/minio").Handler(handler.CheckMinio(checkService))
 }
+
+func setRegisterRouter(router *mux.Router) {
+	router.Methods(http.MethodPost).Path("/api/register").Handler(handler.Register())
+}
