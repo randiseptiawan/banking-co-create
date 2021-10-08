@@ -5,12 +5,9 @@ import (
 	"time"
 )
 
-type Login struct {
+type Role struct {
 	gorm.Model
-	Id_user	 string `gorm:"size:10;not null;primaryKey"`
-	Username string `gorm:"size:20;not null"`
-	Password string `gorm:"size:20;not null"`
-	Login_as int    `gorm:"size:1;not null"`
+	Status	 string `gorm:"size:10;not null"`
 }
 
 type User struct {
@@ -18,7 +15,7 @@ type User struct {
 	// Id_user 		  string `gorm:"size:10;not null"`
 	Nama_Lengkap      string `gorm:"size:50;not null"`
 	Username          string `gorm:"size:20;not null"`
-	Password          string `gorm:"size:20;not null"`
+	Password          string `gorm:"size:255;not null"`
 	Topik_Diminati    string `gorm:"size:50;not null"`
 	// Enrollment_Status int    `gorm:"size:1;not null"`
 }
@@ -37,10 +34,8 @@ type Project struct {
 
 type Artikel struct {
 	gorm.Model
-	// Id_artikel   	uint64   	`gorm:"primaryKey;autoIncrement"`
-	// Posting_Date   	time.Time 
-	Kategori  		string 		`gorm:"size:20;not null"`
-	Judul     		string 		`gorm:"size:50;not null"`
+	Kategori  		string 		`gorm:"size:50;not null"`
+	Judul     		string 		`gorm:"size:100;not null"`
 	Isi_artikel 	string 		`gorm:"size:255;not null"`
 	Penulis 	  	string 		`gorm:"size:20;not null;"`
 }
