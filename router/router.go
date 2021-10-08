@@ -16,6 +16,8 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 
 	setAuthRouter(r, dependencies.AuthService)
 	setCheckRouter(r, dependencies.CheckService)
+	setRegisterRouter(r)
+	setArtikelRouter(r)
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 	return loggedRouter
@@ -33,5 +35,12 @@ func setCheckRouter(router *mux.Router, checkService service.CheckService) {
 }
 
 func setRegisterRouter(router *mux.Router) {
-	router.Methods(http.MethodPost).Path("/api/register").Handler(handler.Register())
+	router.Methods(http.MethodPost).Path("/register").Handler(handler.Register())
+}
+
+func setArtikelRouter(router *mux.Router) {
+	router.Methods(http.MethodGet).Path("/artikel/detail/{id}").Handler(handler.ReadArtikelHandler())
+	router.Methods(http.MethodGet).Path("/list_artikel").Handler(handler.ReadAllArtikelHandler())
+	router.Methods(http.MethodPost).Path("/artikel/create").Handler(handler.CreateArtikelHandler())
+	router.Methods(http.MethodDelete).Path("/artikel/delete/{id}").Handler(handler.DeleteArtikelHandler())
 }

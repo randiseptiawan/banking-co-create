@@ -12,20 +12,18 @@ import (
 func Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var login mysql.Login
+		var user mysql.User
 		payloads, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return
 		}
-		json.Unmarshal(payloads, &login)
-
-		// err = mysql.Register_member(login)
-
+		json.Unmarshal(payloads, &user)
+		err = mysql.Register_Member(user)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusCreated, login, nil)
+		responder.NewHttpResponse(r, w, http.StatusCreated, user, nil)
 	}
 }
