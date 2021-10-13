@@ -11,11 +11,11 @@ func InitMigrationReg() (client *client, err error) {
 	return client, err
 }
 
-func Register_Member(user User) (err error) {
+func Register(user *User) (err error) {
 	db, err := InitMigrationReg()
 	if err != nil {
 		return err
 	}
-	db.dbConnection.Create(&user)
+	db.dbConnection.Create(user)
 	return nil
 }

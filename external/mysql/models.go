@@ -2,40 +2,43 @@ package mysql
 
 import (
 	"gorm.io/gorm"
-	"time"
 )
 
-type Role struct {
-	gorm.Model
-	Status	 string `gorm:"size:10;not null"`
-}
+// type Role struct {
+// 	gorm.Model
+// 	Status	 string `gorm:"size:10;not null"`
+// }
 
 type User struct {
 	gorm.Model
-	// Id_user 		  string `gorm:"size:10;not null"`
-	Nama_Lengkap      string `gorm:"size:50;not null"`
-	Username          string `gorm:"size:20;not null"`
-	Password          string `gorm:"size:255;not null"`
-	Topik_Diminati    string `gorm:"size:50;not null"`
-	// Enrollment_Status int    `gorm:"size:1;not null"`
+	NamaLengkap      string `gorm:"size:50;not null" json:"namaLengkap"`
+	Email            string `gorm:"size:50;not null;unique" json:"email"`
+	Password         string `gorm:"size:100;not null" json:"password"`
+	TopikDiminati    string `gorm:"size:50;not null" json:"topikDiminati"`
+	EnrollmentStatus string `gorm:"size:20;not null" json:"enrollmentStatus"`
+	RoleStatus       string `gorm:"size:10;not null" json:"roleStatus"`
 }
 
 type Project struct {
 	gorm.Model
-	ID        			uint        `gorm:"primaryKey"`
-	Kategori_project  	string 		`gorm:"size:20;not null"`
-	Nama_project      	string 		`gorm:"size:20;not null"`
-	Tanggal_mulai     	time.Time 
-	Link_trello    	  	string 		`gorm:"size:50;not null"`
-	Deskripsi_project 	string 		`gorm:"size:255;not null"`
-	// Invited_user_id   []
-	Project_admin 	  	string 		`gorm:"size:20;not null"`
+	KategoriProject  string `gorm:"size:20;not null" json:"kategoriProject"`
+	NamaProject      string `gorm:"size:20;not null" json:"namaProject"`
+	TanggalMulai     string `gorm:"not null" json:"tanggalMulai"`
+	LinkTrello       string `gorm:"size:50;not null" json:"linkTrello"`
+	DeskripsiProject string `gorm:"size:255;not null" json:"deskripsiProject"`
+	// InvitedUsername      pq.StringArray `json:"invitedUsername"`
+	// InvitedEmail         pq.StringArray `json:"invitedEmail"`
+	// CollaboratorUsername pq.StringArray `json:"collaboratorUsername"`
+	// CollaboratorEmail    pq.StringArray `json:"collaboratorEmail"`
+	ProjectAdmin      string `gorm:"size:50;not null" json:"projectAdmin"`
+	ProjectAdminEmail string `gorm:"size:50;not null" json:"projectAdminEmail"`
 }
 
 type Artikel struct {
 	gorm.Model
-	Kategori  		string 		`gorm:"size:50;not null"`
-	Judul     		string 		`gorm:"size:100;not null"`
-	Isi_artikel 	string 		`gorm:"size:255;not null"`
-	Penulis 	  	string 		`gorm:"size:20;not null;"`
+	Kategori     string `gorm:"size:50;not null" json:"kategori"`
+	Judul        string `gorm:"size:100;not null" json:"judul"`
+	IsiArtikel   string `gorm:"not null" json:"isiArtikel"`
+	NamaPenulis  string `gorm:"size:50;not null json:"namaPenulis;"`
+	EmailPenulis string `gorm:"size:50;not null json:"emailPenulis;"`
 }

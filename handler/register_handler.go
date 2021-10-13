@@ -4,19 +4,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"crypto/sha256"
-	"encoding/base64"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/rysmaadit/go-template/common/responder"
 	"github.com/rysmaadit/go-template/external/mysql"
 )
 
-func encryptPassword(password string) string {
-	h := sha256.Sum256([]byte(password))
-	return "{SHA256}" + base64.StdEncoding.EncodeToString(h[:])
-}
-
-func Register() http.HandlerFunc {
+func RegisterHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		var user mysql.User
@@ -26,8 +21,15 @@ func Register() http.HandlerFunc {
 			return
 		}
 		json.Unmarshal(payloads, &user)
-		user.Password = encryptPassword(user.Password)
-		err = mysql.Register_Member(user)
+		var passwordBytes = []byte(user.Password)
+
+		hashedPassword, _ := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.MinCost)
+
+		user.Password = string(hashedPassword)
+		user.EnrollmentStatus = "Waiting for Approval"
+		user.RoleStatus = "Member"
+
+		err = mysql.Register(&user)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return

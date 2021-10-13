@@ -11,11 +11,14 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/lib/pq v1.10.3
 	github.com/minio/minio-go/v7 v7.0.13
+	github.com/novalagung/gubrak/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.5.1
 	github.com/subosito/gotenv v1.2.0
+	golang.org/x/crypto v0.0.0-20201216223049-8b5274cf687f
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gorm.io/driver/mysql v1.1.2
 	gorm.io/gorm v1.21.14

@@ -18,6 +18,9 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 	setCheckRouter(r, dependencies.CheckService)
 	setRegisterRouter(r)
 	setArtikelRouter(r)
+	setProjectRouter(r)
+	setLoginRouter(r)
+	setDashboardRouter(r)
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 	return loggedRouter
@@ -35,12 +38,27 @@ func setCheckRouter(router *mux.Router, checkService service.CheckService) {
 }
 
 func setRegisterRouter(router *mux.Router) {
-	router.Methods(http.MethodPost).Path("/register").Handler(handler.Register())
+	router.Methods(http.MethodPost).Path("/register").Handler(handler.RegisterHandler())
 }
 
 func setArtikelRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/artikel/detail/{id}").Handler(handler.ReadArtikelHandler())
-	router.Methods(http.MethodGet).Path("/list_artikel").Handler(handler.ReadAllArtikelHandler())
+	router.Methods(http.MethodGet).Path("/artikel/list").Handler(handler.ReadAllArtikelHandler())
 	router.Methods(http.MethodPost).Path("/artikel/create").Handler(handler.CreateArtikelHandler())
 	router.Methods(http.MethodDelete).Path("/artikel/delete/{id}").Handler(handler.DeleteArtikelHandler())
+}
+
+func setProjectRouter(router *mux.Router) {
+	router.Methods(http.MethodGet).Path("/project/detail/{id}").Handler(handler.ReadProjectHandler())
+	router.Methods(http.MethodGet).Path("/project/list").Handler(handler.ReadAllProjectHandler())
+	router.Methods(http.MethodPost).Path("/project/create").Handler(handler.CreateProjectHandler())
+	router.Methods(http.MethodDelete).Path("/project/delete/{id}").Handler(handler.DeleteProjectHandler())
+}
+
+func setLoginRouter(router *mux.Router) {
+	router.Methods(http.MethodPost).Path("/login").Handler(handler.LoginHandler())
+}
+
+func setDashboardRouter(router *mux.Router) {
+	router.Methods(http.MethodGet).Path("/dashboard").Handler(handler.DashboardHandler())
 }

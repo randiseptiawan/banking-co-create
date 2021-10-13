@@ -11,12 +11,12 @@ func InitMigrationArt() (client *client, err error) {
 	return client, err
 }
 
-func CreateArtikel(artikel Artikel) (err error) {
+func CreateArtikel(artikel *Artikel) (err error) {
 	db, err := InitMigrationArt()
 	if err != nil {
 		return err
 	}
-	db.dbConnection.Create(&artikel)
+	db.dbConnection.Create(artikel)
 	return nil
 }
 

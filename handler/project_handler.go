@@ -13,17 +13,17 @@ import (
 	"github.com/rysmaadit/go-template/external/mysql"
 )
 
-func CreateArtikelHandler() http.HandlerFunc {
+func CreateProjectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var artikel mysql.Artikel
+		var project mysql.Project
 		payloads, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return
 		}
-		json.Unmarshal(payloads, &artikel)
-		fmt.Println(payloads, artikel)
+		json.Unmarshal(payloads, &project)
+		fmt.Println(payloads, project)
 
 		c, err := r.Cookie("token")
 		if err != nil {
@@ -62,50 +62,50 @@ func CreateArtikelHandler() http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		artikel.NamaPenulis = claims.NamaLengkap
-		artikel.EmailPenulis = claims.Email
-		err = mysql.CreateArtikel(&artikel)
+		project.ProjectAdmin = claims.NamaLengkap
+		project.ProjectAdminEmail = claims.Email
+		err = mysql.CreateProject(&project)
 
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusCreated, artikel, nil)
+		responder.NewHttpResponse(r, w, http.StatusCreated, project, nil)
 	}
 }
 
-func ReadArtikelHandler() http.HandlerFunc {
+func ReadProjectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		args := mux.Vars(r)
 		i, _ := strconv.ParseUint(args["id"], 10, 64)
 
-		artikel, err := mysql.ReadArtikel(i)
+		project, err := mysql.ReadProject(i)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusOK, artikel, nil)
+		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
 	}
 }
 
-func ReadAllArtikelHandler() http.HandlerFunc {
+func ReadAllProjectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		artikel, err := mysql.ReadAllArtikel()
+		project, err := mysql.ReadAllProject()
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusOK, artikel, nil)
+		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
 	}
 }
 
-func DeleteArtikelHandler() http.HandlerFunc {
+func DeleteProjectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		args := mux.Vars(r)
 		i, _ := strconv.ParseUint(args["id"], 10, 64)
 
-		err := mysql.DeleteArtikel(i)
+		err := mysql.DeleteProject(i)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
 			return
