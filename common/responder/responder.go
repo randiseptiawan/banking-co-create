@@ -3,6 +3,8 @@ package responder
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 
 	pkgErrors "github.com/pkg/errors"
 	"github.com/rysmaadit/go-template/common/errors"
@@ -71,10 +73,11 @@ func GenericError(r *http.Request, w http.ResponseWriter, err error, errorRespon
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseCode)
 
+	responseError := []string{strconv.Itoa(responseCode), http.StatusText(responseCode)}
 	t := Template{
 		Status: false,
 		Result: nil,
-		Error:  errorResponse,
+		Error:  strings.Join(responseError, " "),
 	}
 
 	if errorResponse != nil {

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -19,27 +20,19 @@ func CreateArtikelHandler() http.HandlerFunc {
 		var artikel mysql.Artikel
 		payloads, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 		json.Unmarshal(payloads, &artikel)
 		fmt.Println(payloads, artikel)
 
-		c, err := r.Cookie("token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				// If the cookie is not set, return an unauthorized status
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			// For any other type of error, return a bad request status
-			w.WriteHeader(http.StatusBadRequest)
+		authorizationHeader := r.Header.Get("Authorization")
+		if !strings.Contains(authorizationHeader, "Bearer") {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 
-		// Get the JWT string from the cookie
-		tknStr := c.Value
-
+		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 		// Initialize a new instance of `Claims`
 		claims := &Claims{}
 
@@ -52,22 +45,21 @@ func CreateArtikelHandler() http.HandlerFunc {
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
+				responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
 				return
 			}
-			w.WriteHeader(http.StatusBadRequest)
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 		if !tkn.Valid {
-			w.WriteHeader(http.StatusUnauthorized)
+			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
 			return
 		}
-		artikel.NamaPenulis = claims.NamaLengkap
-		artikel.EmailPenulis = claims.Email
+		artikel.UserId = claims.UserId
 		err = mysql.CreateArtikel(&artikel)
 
 		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 		responder.NewHttpResponse(r, w, http.StatusCreated, artikel, nil)
@@ -84,18 +76,36 @@ func ReadArtikelHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+
+		artikelUser, err := mysql.GetUserById(artikel.UserId)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		artikel.UserName = artikelUser.NamaLengkap
+		artikel.UserEmail = artikelUser.Email
+
 		responder.NewHttpResponse(r, w, http.StatusOK, artikel, nil)
 	}
 }
 
 func ReadAllArtikelHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		artikel, err := mysql.ReadAllArtikel()
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+		for i := 0; i <= len(artikel)-1; i++ {
+			artikelUser, err := mysql.GetUserById(artikel[i].UserId)
+			if err != nil {
+				responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+				return
+			}
+			artikel[i].UserName = artikelUser.NamaLengkap
+			artikel[i].UserEmail = artikelUser.Email
+		}
+
 		responder.NewHttpResponse(r, w, http.StatusOK, artikel, nil)
 	}
 }
@@ -107,9 +117,37 @@ func DeleteArtikelHandler() http.HandlerFunc {
 
 		err := mysql.DeleteArtikel(i)
 		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, err, nil)
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 		responder.NewHttpResponse(r, w, http.StatusOK, "success", nil)
+	}
+}
+
+func UpdateArtikelHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var artikel mysql.Artikel
+		args := mux.Vars(r)
+		payloads, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		json.Unmarshal(payloads, &artikel)
+
+		i, _ := strconv.ParseUint(args["id"], 10, 64)
+
+		err = mysql.UpdateArtikel(uint(i), artikel)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		artikelUpdated, err := mysql.ReadArtikel(i)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		responder.NewHttpResponse(r, w, http.StatusOK, artikelUpdated, nil)
 	}
 }

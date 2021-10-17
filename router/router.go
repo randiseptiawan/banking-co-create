@@ -16,7 +16,6 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 
 	setAuthRouter(r, dependencies.AuthService)
 	setCheckRouter(r, dependencies.CheckService)
-	setRegisterRouter(r)
 	setArtikelRouter(r)
 	setProjectRouter(r)
 	setLoginRouter(r)
@@ -37,15 +36,12 @@ func setCheckRouter(router *mux.Router, checkService service.CheckService) {
 	router.Methods(http.MethodGet).Path("/check/minio").Handler(handler.CheckMinio(checkService))
 }
 
-func setRegisterRouter(router *mux.Router) {
-	router.Methods(http.MethodPost).Path("/register").Handler(handler.RegisterHandler())
-}
-
 func setArtikelRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/artikel/detail/{id}").Handler(handler.ReadArtikelHandler())
 	router.Methods(http.MethodGet).Path("/artikel/list").Handler(handler.ReadAllArtikelHandler())
 	router.Methods(http.MethodPost).Path("/artikel/create").Handler(handler.CreateArtikelHandler())
 	router.Methods(http.MethodDelete).Path("/artikel/delete/{id}").Handler(handler.DeleteArtikelHandler())
+	router.Methods(http.MethodPut).Path("/artikel/update/{id}").Handler(handler.UpdateArtikelHandler())
 }
 
 func setProjectRouter(router *mux.Router) {
@@ -53,10 +49,13 @@ func setProjectRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/project/list").Handler(handler.ReadAllProjectHandler())
 	router.Methods(http.MethodPost).Path("/project/create").Handler(handler.CreateProjectHandler())
 	router.Methods(http.MethodDelete).Path("/project/delete/{id}").Handler(handler.DeleteProjectHandler())
+	router.Methods(http.MethodPost).Path("/project/{id}/invite").Handler(handler.InviteUserHandler())
+	router.Methods(http.MethodPut).Path("/project/update/{id}").Handler(handler.UpdateProjectHandler())
 }
 
 func setLoginRouter(router *mux.Router) {
 	router.Methods(http.MethodPost).Path("/login").Handler(handler.LoginHandler())
+	router.Methods(http.MethodPost).Path("/register").Handler(handler.RegisterHandler())
 }
 
 func setDashboardRouter(router *mux.Router) {

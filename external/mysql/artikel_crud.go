@@ -1,16 +1,5 @@
 package mysql
 
-func InitMigrationArt() (client *client, err error) {
-	init_db := Init_db()
-	client = NewMysqlClient(*init_db)
-	if err != nil {
-		return nil, err
-	}
-
-	client.dbConnection.AutoMigrate(Artikel{})
-	return client, err
-}
-
 func CreateArtikel(artikel *Artikel) (err error) {
 	db, err := InitMigrationArt()
 	if err != nil {
@@ -34,7 +23,7 @@ func ReadArtikel(id uint64) (artikel Artikel, err error) {
 	}
 	res := db.dbConnection.First(&artikel, "id=?", id)
 	if res.Error != nil {
-		return Artikel{}, err
+		return Artikel{}, res.Error
 	}
 	return artikel, nil
 }
@@ -46,5 +35,14 @@ func DeleteArtikel(id uint64) (err error) {
 	}
 	var artikel Artikel
 	db.dbConnection.Model(&artikel).Where("id=?", id).Delete(&artikel)
+	return nil
+}
+
+func UpdateArtikel(id uint, artikel Artikel) (err error) {
+	db, err := InitMigrationPro()
+	if err != nil {
+		return err
+	}
+	db.dbConnection.Model(&artikel).Where("id=?", id).Updates(&artikel)
 	return nil
 }

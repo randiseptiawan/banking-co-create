@@ -1,16 +1,5 @@
 package mysql
 
-func InitMigrationPro() (client *client, err error) {
-	init_db := Init_db()
-	client = NewMysqlClient(*init_db)
-	if err != nil {
-		return nil, err
-	}
-
-	client.dbConnection.AutoMigrate(Project{})
-	return client, err
-}
-
 func CreateProject(project *Project) (err error) {
 	db, err := InitMigrationPro()
 	if err != nil {
@@ -22,7 +11,6 @@ func CreateProject(project *Project) (err error) {
 
 func ReadAllProject() (project []Project, err error) {
 	db, _ := InitMigrationPro()
-
 	db.dbConnection.Find(&project)
 	return project, nil
 }
@@ -39,6 +27,15 @@ func ReadProject(id uint64) (project Project, err error) {
 	return project, err
 }
 
+func UpdateProject(id uint, project Project) (err error) {
+	db, err := InitMigrationPro()
+	if err != nil {
+		return err
+	}
+	db.dbConnection.Model(&project).Where("id=?", id).Updates(&project)
+	return nil
+}
+
 func DeleteProject(id uint64) (err error) {
 	db, err := InitMigrationPro()
 	if err != nil {
@@ -46,5 +43,14 @@ func DeleteProject(id uint64) (err error) {
 	}
 	var project Project
 	db.dbConnection.Model(&project).Where("id=?", id).Delete(&project)
+	return nil
+}
+
+func InviteUser(invited *Invited) (err error) {
+	db, err := InitMigrationInv()
+	if err != nil {
+		return err
+	}
+	db.dbConnection.Create(invited)
 	return nil
 }

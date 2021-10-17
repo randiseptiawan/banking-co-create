@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -10,20 +12,27 @@ import (
 func DashboardHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// We can obtain the session token from the requests cookies, which come with every request
-		c, err := r.Cookie("token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				// If the cookie is not set, return an unauthorized status
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			// For any other type of error, return a bad request status
-			w.WriteHeader(http.StatusBadRequest)
+		// c, err := r.Cookie("token")
+		// if err != nil {
+		// 	if err == http.ErrNoCookie {
+		// 		// If the cookie is not set, return an unauthorized status
+		// 		w.WriteHeader(http.StatusUnauthorized)
+		// 		return
+		// 	}
+		// 	// For any other type of error, return a bad request status
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	return
+		// }
+
+		// // Get the JWT string from the cookie
+		// tknStr := c.Value
+		authorizationHeader := r.Header.Get("Authorization")
+		if !strings.Contains(authorizationHeader, "Bearer") {
+			http.Error(w, "Invalid token", http.StatusBadRequest)
 			return
 		}
 
-		// Get the JWT string from the cookie
-		tknStr := c.Value
+		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
 		// Initialize a new instance of `Claims`
 		claims := &Claims{}
@@ -49,6 +58,7 @@ func DashboardHandler() http.HandlerFunc {
 		}
 		// Finally, return the welcome message to the user, along with their
 		// username given in the token
-		w.Write([]byte(fmt.Sprintf("Welcome %s!", claims.NamaLengkap)))
+		var s string = strconv.FormatUint(uint64(claims.UserId), 10)
+		w.Write([]byte(fmt.Sprintf("Welcome %s!", s)))
 	}
 }
