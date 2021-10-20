@@ -37,20 +37,20 @@ func setCheckRouter(router *mux.Router, checkService service.CheckService) {
 }
 
 func setArtikelRouter(router *mux.Router) {
-	router.Methods(http.MethodGet).Path("/artikel/detail/{id}").Handler(handler.ReadArtikelHandler())
-	router.Methods(http.MethodGet).Path("/artikel/list").Handler(handler.ReadAllArtikelHandler())
-	router.Methods(http.MethodPost).Path("/artikel/create").Handler(handler.CreateArtikelHandler())
-	router.Methods(http.MethodDelete).Path("/artikel/delete/{id}").Handler(handler.DeleteArtikelHandler())
-	router.Methods(http.MethodPut).Path("/artikel/update/{id}").Handler(handler.UpdateArtikelHandler())
+	router.Methods(http.MethodGet).Path("/artikel/{id}").Handler(handler.ReadArtikelHandler())
+	router.Methods(http.MethodGet).Path("/artikel").Handler(handler.ReadAllArtikelHandler())
+	router.Methods(http.MethodPost).Path("/artikel").Handler(handler.CreateArtikelHandler())
+	router.Methods(http.MethodDelete).Path("/artikel/{id}").Handler(handler.DeleteArtikelHandler())
+	router.Methods(http.MethodPut).Path("/artikel/{id}").Handler(handler.UpdateArtikelHandler())
 }
 
 func setProjectRouter(router *mux.Router) {
-	router.Methods(http.MethodGet).Path("/project/detail/{id}").Handler(handler.ReadProjectHandler())
-	router.Methods(http.MethodGet).Path("/project/list").Handler(handler.ReadAllProjectHandler())
-	router.Methods(http.MethodPost).Path("/project/create").Handler(handler.CreateProjectHandler())
-	router.Methods(http.MethodDelete).Path("/project/delete/{id}").Handler(handler.DeleteProjectHandler())
-	router.Methods(http.MethodPost).Path("/project/{id}/invite").Handler(handler.InviteUserHandler())
-	router.Methods(http.MethodPut).Path("/project/update/{id}").Handler(handler.UpdateProjectHandler())
+	router.Methods(http.MethodGet).Path("/project/{id}").Handler(handler.ReadProjectHandler())
+	router.Methods(http.MethodGet).Path("/project").Handler(handler.ReadAllProjectHandler())
+	router.Methods(http.MethodPost).Path("/project").Handler(handler.CreateProjectHandler())
+	router.Methods(http.MethodDelete).Path("/project/{id}").Handler(handler.DeleteProjectHandler())
+	router.Methods(http.MethodPost).Path("/project/invite/{id}").Handler(handler.InviteUserHandler())
+	router.Methods(http.MethodPut).Path("/project/{id}").Handler(handler.UpdateProjectHandler())
 }
 
 func setLoginRouter(router *mux.Router) {
@@ -59,5 +59,5 @@ func setLoginRouter(router *mux.Router) {
 }
 
 func setDashboardRouter(router *mux.Router) {
-	router.Methods(http.MethodGet).Path("/dashboard").Handler(handler.DashboardHandler())
+	router.Methods(http.MethodGet).Path("/").Handler(handler.HomeHandler())
 }

@@ -99,3 +99,10 @@ func RegisterHandler() http.HandlerFunc {
 		responder.NewHttpResponse(r, w, http.StatusCreated, user, nil)
 	}
 }
+
+func HomeHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res := []byte("Welcome")
+		responder.NewHttpResponse(r, w, http.StatusOK, res, nil)
+	}
+}
