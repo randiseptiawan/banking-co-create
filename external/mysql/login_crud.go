@@ -6,7 +6,6 @@ func GetUser(email string) (user User, err error) {
 		return User{}, err
 	}
 	res := db.dbConnection.First(&user, "email=?", email)
-	// fmt.Println(res.Error)
 	if res.Error != nil {
 		return User{}, res.Error
 	}
@@ -19,7 +18,6 @@ func GetUserById(id uint) (user User, err error) {
 		return User{}, err
 	}
 	res := db.dbConnection.First(&user, "id=?", id)
-	// fmt.Println(res.Error)
 	if res.Error != nil {
 		return User{}, res.Error
 	}

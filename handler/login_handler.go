@@ -34,49 +34,35 @@ type Claims struct {
 func LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var creds Credentials
-		// Get the JSON body and decode into credentials
 		err := json.NewDecoder(r.Body).Decode(&creds)
 		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 
-		// Get the expected password from our in memory map
-		// expectedPassword, ok := users[creds.Username]
 		user, err := mysql.GetUser(creds.Email)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
 			return
 		}
-		// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.MinCost)
-		// fmt.Println(string(hashedPassword), user.Password)
 		if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
-			// If the two passwords don't match, return a 401 status
 			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
 			return
 		}
 
-		// Declare the expiration time of the token
-		// here, we have kept it as 5 minutes
 		expirationTime := time.Now().Add(60 * time.Minute)
-		// Create the JWT claims, which includes the username and expiry time
 		claims := &Claims{
 			UserId:     user.Model.ID,
 			Email:      user.Email,
 			RoleStatus: user.RoleStatus,
 			StandardClaims: jwt.StandardClaims{
-				// In JWT, the expiry time is expressed as unix milliseconds
 				ExpiresAt: expirationTime.Unix(),
 			},
 		}
 
-		// Declare the token with the algorithm used for signing, and the claims
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		// Create the JWT string
 		signedToken, err := token.SignedString(jwtKey)
 		if err != nil {
-			// If there is an error in creating the JWT return an internal server error
 			responder.NewHttpResponse(r, w, http.StatusInternalServerError, nil, err)
 			return
 		}
@@ -109,6 +95,7 @@ func RegisterHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+		user.Password = ""
 		responder.NewHttpResponse(r, w, http.StatusCreated, user, nil)
 	}
 }

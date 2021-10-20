@@ -35,13 +35,8 @@ func CreateProjectHandler() http.HandlerFunc {
 
 		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
 
-		// Initialize a new instance of `Claims`
 		claims := &Claims{}
 
-		// Parse the JWT string and store the result in `claims`.
-		// Note that we are passing the key in this method as well. This method will return an error
-		// if the token is invalid (if it has expired according to the expiry time we set on sign in),
-		// or if the signature does not match
 		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
 		})
@@ -64,7 +59,15 @@ func CreateProjectHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusCreated, nil, nil)
+
+		projectAdmin, err := mysql.GetUserById(claims.UserId)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		project.ProjectAdminName = projectAdmin.NamaLengkap
+		project.ProjectAdminEmail = projectAdmin.Email
+		responder.NewHttpResponse(r, w, http.StatusCreated, project, nil)
 	}
 }
 
