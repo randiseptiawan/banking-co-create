@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -65,6 +64,7 @@ func setProjectRouter(router *mux.Router) {
 func setLoginRouter(router *mux.Router) {
 	router.Methods(http.MethodPost).Path("/login").Handler(handler.LoginHandler())
 	router.Methods(http.MethodPost).Path("/register").Handler(handler.RegisterHandler())
+	router.Methods(http.MethodPost).Path("/register/admin").Handler(handler.RegisterAdminHandler())
 }
 
 func setHomeRouter(router *mux.Router) {
@@ -80,18 +80,4 @@ func setInvitedRouter(router *mux.Router) {
 func setEnrollmentRouter(router *mux.Router) {
 	router.Methods(http.MethodPut).Path("/enrollment_status/{id}").Handler(handler.UpdateEnrollmentStatusHandler())
 	router.Methods(http.MethodGet).Path("/user").Handler(handler.ReadAllUserHandler())
-}
-
-func CorsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Executing middleware", r.Method)
-
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token, Authorization")
-		w.Header().Set("Content-Type", "application/json")
-
-		next.ServeHTTP(w, r)
-		log.Println("Executing middleware again")
-	})
 }

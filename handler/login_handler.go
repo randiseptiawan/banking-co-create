@@ -106,3 +106,31 @@ func HomeHandler() http.HandlerFunc {
 		responder.NewHttpResponse(r, w, http.StatusOK, res, nil)
 	}
 }
+
+func RegisterAdminHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var user mysql.User
+		payloads, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		json.Unmarshal(payloads, &user)
+		var passwordBytes = []byte(user.Password)
+
+		hashedPassword, _ := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.MinCost)
+
+		user.Password = string(hashedPassword)
+		user.EnrollmentStatus = "Waiting for Approval"
+		user.RoleStatus = "Admin"
+
+		err = mysql.CreateUser(&user)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		user.Password = ""
+		responder.NewHttpResponse(r, w, http.StatusCreated, user, nil)
+	}
+}
