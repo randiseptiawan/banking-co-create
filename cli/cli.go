@@ -38,7 +38,7 @@ func (c *Cli) Run(application *app.Application) {
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%v", application.Config.AppPort),
-		Handler: router.NewRouter(service.InstantiateDependencies(application)),
+		Handler: router.CorsMiddleware(router.NewRouter(service.InstantiateDependencies(application))),
 	}
 
 	log.Println(fmt.Sprintf("starting application { %v } on port :%v", application.Config.AppName, application.Config.AppPort))

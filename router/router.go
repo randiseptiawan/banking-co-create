@@ -24,7 +24,7 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 	setInvitedRouter(r)
 	setEnrollmentRouter(r)
 
-	loggedRouter := handlers.LoggingHandler(os.Stdout, corsMiddleware(r))
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 	return loggedRouter
 }
 
@@ -75,7 +75,7 @@ func setEnrollmentRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/user").Handler(handler.ReadAllUserHandler())
 }
 
-func corsMiddleware(next http.Handler) http.Handler {
+func CorsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Executing middleware", r.Method)
 
