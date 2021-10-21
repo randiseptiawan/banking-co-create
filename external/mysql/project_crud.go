@@ -22,7 +22,7 @@ func ReadProject(id uint64) (project Project, err error) {
 	}
 	res := db.dbConnection.First(&project, "id=?", id)
 	if res.Error != nil {
-		return Project{}, err
+		return Project{}, res.Error
 	}
 	return project, err
 }
@@ -43,14 +43,5 @@ func DeleteProject(id uint64) (err error) {
 	}
 	var project Project
 	db.dbConnection.Model(&project).Where("id=?", id).Delete(&project)
-	return nil
-}
-
-func InviteUser(invited *Invited) (err error) {
-	db, err := InitMigrationInv()
-	if err != nil {
-		return err
-	}
-	db.dbConnection.Create(invited)
 	return nil
 }

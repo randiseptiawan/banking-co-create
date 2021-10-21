@@ -17,6 +17,16 @@ type Invite struct {
 	Email string `json:"email"`
 }
 
+type InvitedUser struct {
+	NamaLengkap string `json:"NamaLengkap"`
+	Email       string `json:"string"`
+}
+
+type CollaboratedUser struct {
+	NamaLengkap string `json:"NamaLengkap"`
+	Email       string `json:"string"`
+}
+
 func CreateProjectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -90,6 +100,12 @@ func ReadProjectHandler() http.HandlerFunc {
 		project.ProjectAdminName = projectAdmin.NamaLengkap
 		project.ProjectAdminEmail = projectAdmin.Email
 
+		// collaboratorUser, err := mysql.GetCollaboratorUser(i)
+		// if err != nil {
+		// 	responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+		// 	return
+		// }
+		// fmt.Println(collaboratorUser)
 		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
 	}
 }
@@ -153,38 +169,5 @@ func UpdateProjectHandler() http.HandlerFunc {
 			return
 		}
 		responder.NewHttpResponse(r, w, http.StatusOK, projectUpdated, nil)
-	}
-}
-
-func InviteUserHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var inv Invite
-		// Get the JSON body and decode into credentials
-		err := json.NewDecoder(r.Body).Decode(&inv)
-		if err != nil {
-			// If the structure of the body is wrong, return an HTTP error
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		// Get the expected password from our in memory map
-		// expectedPassword, ok := users[creds.Username]
-		user, err := mysql.GetUser(inv.Email)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-
-		args := mux.Vars(r)
-		IdProject, _ := strconv.ParseUint(args["id"], 10, 64)
-
-		var invited mysql.Invited
-		invited.ProjectId = uint(IdProject)
-		invited.InvitedUserId = user.Model.ID
-		err = mysql.InviteUser(&invited)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		responder.NewHttpResponse(r, w, http.StatusCreated, invited, nil)
 	}
 }

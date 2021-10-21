@@ -28,18 +28,13 @@ func CreateArtikelHandler() http.HandlerFunc {
 
 		authorizationHeader := r.Header.Get("Authorization")
 		if !strings.Contains(authorizationHeader, "Bearer") {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			http.Error(w, "Invalid token", http.StatusBadRequest)
 			return
 		}
 
 		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
-		// Initialize a new instance of `Claims`
 		claims := &Claims{}
 
-		// Parse the JWT string and store the result in `claims`.
-		// Note that we are passing the key in this method as well. This method will return an error
-		// if the token is invalid (if it has expired according to the expiry time we set on sign in),
-		// or if the signature does not match
 		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
 		})
@@ -62,6 +57,13 @@ func CreateArtikelHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+		artikelUser, err := mysql.GetUserById(artikel.UserId)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		artikel.UserName = artikelUser.NamaLengkap
+		artikel.UserEmail = artikelUser.Email
 		responder.NewHttpResponse(r, w, http.StatusCreated, artikel, nil)
 	}
 }

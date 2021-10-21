@@ -90,7 +90,7 @@ func RegisterHandler() http.HandlerFunc {
 		user.EnrollmentStatus = "Waiting for Approval"
 		user.RoleStatus = "Member"
 
-		err = mysql.Register(&user)
+		err = mysql.CreateUser(&user)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return

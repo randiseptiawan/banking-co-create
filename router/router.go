@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -19,9 +20,11 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 	setArtikelRouter(r)
 	setProjectRouter(r)
 	setLoginRouter(r)
-	setDashboardRouter(r)
+	setHomeRouter(r)
+	setInvitedRouter(r)
+	setEnrollmentRouter(r)
 
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, corsMiddleware(r))
 	return loggedRouter
 }
 
@@ -49,7 +52,6 @@ func setProjectRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/project").Handler(handler.ReadAllProjectHandler())
 	router.Methods(http.MethodPost).Path("/project").Handler(handler.CreateProjectHandler())
 	router.Methods(http.MethodDelete).Path("/project/{id}").Handler(handler.DeleteProjectHandler())
-	router.Methods(http.MethodPost).Path("/project/invite/{id}").Handler(handler.InviteUserHandler())
 	router.Methods(http.MethodPut).Path("/project/{id}").Handler(handler.UpdateProjectHandler())
 }
 
@@ -58,6 +60,34 @@ func setLoginRouter(router *mux.Router) {
 	router.Methods(http.MethodPost).Path("/register").Handler(handler.RegisterHandler())
 }
 
-func setDashboardRouter(router *mux.Router) {
+func setHomeRouter(router *mux.Router) {
 	router.Methods(http.MethodGet).Path("/").Handler(handler.HomeHandler())
+}
+
+func setInvitedRouter(router *mux.Router) {
+	router.Methods(http.MethodPost).Path("/accept").Handler(handler.AcceptInvitedHandler())
+	router.Methods(http.MethodPost).Path("/invite/{id}").Handler(handler.InviteUserHandler())
+	router.Methods(http.MethodPost).Path("/ignore").Handler(handler.IgnoreInvitedHandler())
+}
+
+func setEnrollmentRouter(router *mux.Router) {
+	router.Methods(http.MethodPut).Path("/enrollment_status/{id}").Handler(handler.UpdateEnrollmentStatusHandler())
+	router.Methods(http.MethodGet).Path("/user").Handler(handler.ReadAllUserHandler())
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Executing middleware", r.Method)
+
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers:", "Origin, Content-Type, X-Auth-Token, Authorization")
+			w.Header().Set("Content-Type", "application/json")
+			return
+		}
+
+		next.ServeHTTP(w, r)
+		log.Println("Executing middleware again")
+	})
 }
