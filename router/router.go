@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func NewRouter(dependencies service.Dependencies) http.Handler {
@@ -24,7 +25,13 @@ func NewRouter(dependencies service.Dependencies) http.Handler {
 	setInvitedRouter(r)
 	setEnrollmentRouter(r)
 
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"}, // All origins
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders: []string{"Origin", "Content-Type", "X-Auth-Token", "Authorization"},
+	})
+
+	loggedRouter := handlers.LoggingHandler(os.Stdout, c.Handler(r))
 	return loggedRouter
 }
 
