@@ -15,34 +15,6 @@ import (
 
 func ReadAllUserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// authorizationHeader := r.Header.Get("Authorization")
-		// if !strings.Contains(authorizationHeader, "Bearer") {
-		// 	http.Error(w, "Invalid token", http.StatusBadRequest)
-		// 	return
-		// }
-
-		// tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
-		// claims := &Claims{}
-
-		// tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		// 	return jwtKey, nil
-		// })
-		// if err != nil {
-		// 	if err == jwt.ErrSignatureInvalid {
-		// 		responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
-		// 		return
-		// 	}
-		// 	responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-		// 	return
-		// }
-		// if !tkn.Valid {
-		// 	responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
-		// 	return
-		// }
-		// if claims.RoleStatus != "Admin" {
-		// 	responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
-		// 	return
-		// }
 		user, err := mysql.GetAllUser()
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)

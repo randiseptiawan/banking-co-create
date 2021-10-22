@@ -26,7 +26,7 @@ func GetUserById(id uint) (user User, err error) {
 
 func GetAllUser() (user []User, err error) {
 	db, _ := InitMigrationUser()
-	db.dbConnection.Find(&user)
+	db.dbConnection.Where("role_status <> ?", "Admin").Find(&user)
 	return user, nil
 }
 
