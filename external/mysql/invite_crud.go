@@ -37,15 +37,15 @@ func ProjectInvited(userId uint) (project Project, err error) {
 	return project, nil
 }
 
-func GetInvitedUser(id uint64) (invited Invited, err error) {
+func GetInvitedUser(id uint, projectId uint64) (invited []Invited, err error) {
 	db, err := InitMigrationInv()
-	if err != nil {
-		return Invited{}, err
-	}
-	res := db.dbConnection.First(&invited, "project_id=?", id)
-	if res.Error != nil {
-		return Invited{}, res.Error
-	}
+	// if err != nil {
+	// 	return Invited{}, err
+	// }
+	db.dbConnection.Find(&invited, "project_id=? AND invited_user_id=?", projectId, id)
+	// if res.Error != nil {
+	// 	return Invited{}, res.Error
+	// }
 	return invited, err
 }
 

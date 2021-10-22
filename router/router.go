@@ -72,9 +72,9 @@ func setHomeRouter(router *mux.Router) {
 }
 
 func setInvitedRouter(router *mux.Router) {
-	router.Methods(http.MethodPost).Path("/accept").Handler(handler.AcceptInvitedHandler())
+	router.Methods(http.MethodPost).Path("/accept/{id}").Handler(handler.AcceptInvitedHandler())
 	router.Methods(http.MethodPost).Path("/invite/{id}").Handler(handler.InviteUserHandler())
-	router.Methods(http.MethodPost).Path("/ignore").Handler(handler.IgnoreInvitedHandler())
+	router.Methods(http.MethodPost).Path("/ignore/{id}").Handler(handler.IgnoreInvitedHandler())
 }
 
 func setEnrollmentRouter(router *mux.Router) {
