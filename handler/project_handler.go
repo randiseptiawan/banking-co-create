@@ -166,6 +166,14 @@ func UpdateProjectHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+		projectAdmin, err := mysql.GetProjectAdmin(uint(i))
+		projectUpdated.ProjectAdmin = projectAdmin
+
+		invitedUser, err := mysql.GetInvitedUsername(uint(i))
+		projectUpdated.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(i))
+		projectUpdated.Collaborator = collaboratedUser
 		responder.NewHttpResponse(r, w, http.StatusOK, projectUpdated, nil)
 	}
 }

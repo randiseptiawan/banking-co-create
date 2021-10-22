@@ -80,4 +80,5 @@ func setInvitedRouter(router *mux.Router) {
 func setEnrollmentRouter(router *mux.Router) {
 	router.Methods(http.MethodPut).Path("/enrollment_status/{id}").Handler(handler.UpdateEnrollmentStatusHandler())
 	router.Methods(http.MethodGet).Path("/user").Handler(handler.ReadAllUserHandler())
+	router.Methods(http.MethodDelete).Path("/user/{id}").Handler(handler.DeleteUserHandler())
 }

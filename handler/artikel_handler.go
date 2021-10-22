@@ -150,6 +150,13 @@ func UpdateArtikelHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
+        artikelUser, err := mysql.GetUserById(artikelUpdated.UserId)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		artikelUpdated.UserName = artikelUser.NamaLengkap
+		artikelUpdated.UserEmail = artikelUser.Email
 		responder.NewHttpResponse(r, w, http.StatusOK, artikelUpdated, nil)
 	}
 }

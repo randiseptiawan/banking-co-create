@@ -83,3 +83,17 @@ func UpdateEnrollmentStatusHandler() http.HandlerFunc {
 		responder.NewHttpResponse(r, w, http.StatusOK, userUpdated, nil)
 	}
 }
+
+func DeleteUserHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		args := mux.Vars(r)
+		i, _ := strconv.ParseUint(args["id"], 10, 64)
+
+		err := mysql.DeleteUserById(i)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		responder.NewHttpResponse(r, w, http.StatusOK, "success", nil)
+	}
+}

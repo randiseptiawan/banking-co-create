@@ -74,12 +74,20 @@ func InviteUserHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		updatedProject, err := mysql.ReadProject(IdProject)
+		projectUpdated, err := mysql.ReadProject(IdProject)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusCreated, updatedProject, nil)
+		projectAdmin, err := mysql.GetProjectAdmin(uint(IdProject))
+		projectUpdated.ProjectAdmin = projectAdmin
+
+		invitedUser, err := mysql.GetInvitedUsername(uint(IdProject))
+		projectUpdated.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(IdProject))
+		projectUpdated.Collaborator = collaboratedUser
+		responder.NewHttpResponse(r, w, http.StatusCreated, projectUpdated, nil)
 	}
 }
 
@@ -136,12 +144,20 @@ func AcceptInvitedHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		updatedProject, err := mysql.ReadProject(IdProject)
+		projectUpdated, err := mysql.ReadProject(IdProject)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusOK, updatedProject, nil)
+		projectAdmin, err := mysql.GetProjectAdmin(uint(IdProject))
+		projectUpdated.ProjectAdmin = projectAdmin
+
+		invitedUser, err := mysql.GetInvitedUsername(uint(IdProject))
+		projectUpdated.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(IdProject))
+		projectUpdated.Collaborator = collaboratedUser
+		responder.NewHttpResponse(r, w, http.StatusCreated, projectUpdated, nil)
 	}
 }
 
@@ -189,11 +205,19 @@ func IgnoreInvitedHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		updatedProject, err := mysql.ReadProject(IdProject)
+		projectUpdated, err := mysql.ReadProject(IdProject)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		responder.NewHttpResponse(r, w, http.StatusOK, updatedProject, nil)
+		projectAdmin, err := mysql.GetProjectAdmin(uint(IdProject))
+		projectUpdated.ProjectAdmin = projectAdmin
+
+		invitedUser, err := mysql.GetInvitedUsername(uint(IdProject))
+		projectUpdated.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(IdProject))
+		projectUpdated.Collaborator = collaboratedUser
+		responder.NewHttpResponse(r, w, http.StatusCreated, projectUpdated, nil)
 	}
 }

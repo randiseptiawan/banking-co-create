@@ -30,6 +30,16 @@ func GetAllUser() (user []User, err error) {
 	return user, nil
 }
 
+func DeleteUserById(id uint64) (err error) {
+	db, err := InitMigrationUser()
+	if err != nil {
+		return err
+	}
+	var user User
+	db.dbConnection.Model(&user).Where("id=?", id).Delete(&user)
+	return nil
+}
+
 func UpdateUser(id uint, user User) (err error) {
 	db, err := InitMigrationUser()
 	if err != nil {
