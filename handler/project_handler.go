@@ -70,13 +70,15 @@ func CreateProjectHandler() http.HandlerFunc {
 			return
 		}
 
-		projectAdmin, err := mysql.GetUserById(claims.UserId)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		project.ProjectAdminName = projectAdmin.NamaLengkap
-		project.ProjectAdminEmail = projectAdmin.Email
+		projectAdmin, err := mysql.GetProjectAdmin(uint(project.Model.ID))
+		project.ProjectAdmin = projectAdmin
+
+		invitedUser, err := mysql.GetInvitedUsername(uint(project.Model.ID))
+		project.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(project.Model.ID))
+		project.Collaborator = collaboratedUser
+
 		responder.NewHttpResponse(r, w, http.StatusCreated, project, nil)
 	}
 }
@@ -92,20 +94,15 @@ func ReadProjectHandler() http.HandlerFunc {
 			return
 		}
 
-		projectAdmin, err := mysql.GetUserById(project.ProjectAdminId)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		project.ProjectAdminName = projectAdmin.NamaLengkap
-		project.ProjectAdminEmail = projectAdmin.Email
+		projectAdmin, err := mysql.GetProjectAdmin(uint(i))
+		project.ProjectAdmin = projectAdmin
 
-		// collaboratorUser, err := mysql.GetCollaboratorUser(i)
-		// if err != nil {
-		// 	responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-		// 	return
-		// }
-		// fmt.Println(collaboratorUser)
+		invitedUser, err := mysql.GetInvitedUsername(uint(i))
+		project.InvitedUser = invitedUser
+
+		collaboratedUser, err := mysql.GetCollaboratedUsername(uint(i))
+		project.Collaborator = collaboratedUser
+
 		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
 	}
 }
@@ -118,13 +115,14 @@ func ReadAllProjectHandler() http.HandlerFunc {
 			return
 		}
 		for i := 0; i <= len(project)-1; i++ {
-			projectAdmin, err := mysql.GetUserById(project[i].ProjectAdminId)
-			if err != nil {
-				responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-				return
-			}
-			project[i].ProjectAdminName = projectAdmin.NamaLengkap
-			project[i].ProjectAdminEmail = projectAdmin.Email
+			projectAdmin, _ := mysql.GetProjectAdmin(uint(project[i].Model.ID))
+			project[i].ProjectAdmin = projectAdmin
+
+			invitedUser, _ := mysql.GetInvitedUsername(uint(project[i].Model.ID))
+			project[i].InvitedUser = invitedUser
+
+			collaboratedUser, _ := mysql.GetCollaboratedUsername(uint(project[i].Model.ID))
+			project[i].Collaborator = collaboratedUser
 		}
 		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
 	}

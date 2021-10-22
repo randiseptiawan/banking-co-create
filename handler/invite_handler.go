@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -24,16 +23,49 @@ func InviteUserHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-		// Get the expected password from our in memory map
-		// expectedPassword, ok := users[creds.Username]
-		user, err := mysql.GetUser(inv.Email)
+
+		authorizationHeader := r.Header.Get("Authorization")
+		if !strings.Contains(authorizationHeader, "Bearer") {
+			http.Error(w, "Invalid token", http.StatusBadRequest)
+			return
+		}
+
+		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
+		claims := &Claims{}
+
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
+				return
+			}
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
+		if !tkn.Valid {
+			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
+			return
+		}
+		args := mux.Vars(r)
+		IdProject, _ := strconv.ParseUint(args["id"], 10, 64)
+		project, err := mysql.ReadProject(IdProject)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
 
-		args := mux.Vars(r)
-		IdProject, _ := strconv.ParseUint(args["id"], 10, 64)
+		if claims.UserId != project.ProjectAdminId {
+			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
+			return
+		}
+
+		user, err := mysql.GetUser(inv.Email)
+		if err != nil {
+			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+			return
+		}
 
 		var invited mysql.Invited
 		invited.ProjectId = uint(IdProject)
@@ -57,7 +89,6 @@ func AcceptInvitedHandler() http.HandlerFunc {
 			return
 		}
 		json.Unmarshal(payloads, &collaborator)
-		fmt.Println(collaborator)
 		err = mysql.DeleteInvitedUser(uint64(collaborator.CollaboratorUserId), uint64(collaborator.ProjectId))
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
@@ -93,47 +124,47 @@ func IgnoreInvitedHandler() http.HandlerFunc {
 	}
 }
 
-func ReadProjectInvitedHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		authorizationHeader := r.Header.Get("Authorization")
-		if !strings.Contains(authorizationHeader, "Bearer") {
-			http.Error(w, "Invalid token", http.StatusBadRequest)
-			return
-		}
+// func ReadProjectInvitedHandler() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		authorizationHeader := r.Header.Get("Authorization")
+// 		if !strings.Contains(authorizationHeader, "Bearer") {
+// 			http.Error(w, "Invalid token", http.StatusBadRequest)
+// 			return
+// 		}
 
-		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
-		claims := &Claims{}
+// 		tknStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
+// 		claims := &Claims{}
 
-		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
-		})
-		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
-				return
-			}
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		if !tkn.Valid {
-			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
-			return
-		}
+// 		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+// 			return jwtKey, nil
+// 		})
+// 		if err != nil {
+// 			if err == jwt.ErrSignatureInvalid {
+// 				responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
+// 				return
+// 			}
+// 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+// 			return
+// 		}
+// 		if !tkn.Valid {
+// 			responder.NewHttpResponse(r, w, http.StatusUnauthorized, nil, err)
+// 			return
+// 		}
 
-		project, err := mysql.ProjectInvited(claims.UserId)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
+// 		project, err := mysql.ProjectInvited(claims.UserId)
+// 		if err != nil {
+// 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+// 			return
+// 		}
 
-		projectAdmin, err := mysql.GetUserById(project.ProjectAdminId)
-		if err != nil {
-			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
-			return
-		}
-		project.ProjectAdminName = projectAdmin.NamaLengkap
-		project.ProjectAdminEmail = projectAdmin.Email
+// 		// projectAdmin, err := mysql.GetUserById(project.ProjectAdminId)
+// 		// if err != nil {
+// 		// 	responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
+// 		// 	return
+// 		// }
+// 		// project.ProjectAdminName = projectAdmin.NamaLengkap
+// 		// project.ProjectAdminEmail = projectAdmin.Email
 
-		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
-	}
-}
+// 		responder.NewHttpResponse(r, w, http.StatusOK, project, nil)
+// 	}
+// }

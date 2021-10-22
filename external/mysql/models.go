@@ -16,18 +16,15 @@ type User struct {
 
 type Project struct {
 	gorm.Model
-	KategoriProject      string   `gorm:"not null" json:"KategoriProject"`
-	NamaProject          string   `gorm:"not null" json:"NamaProject"`
-	TanggalMulai         string   `gorm:"not null" json:"TanggalMulai"`
-	LinkTrello           string   `gorm:"not null" json:"LinkTrello"`
-	DeskripsiProject     string   `gorm:"not null" json:"DeskripsiProject"`
-	ProjectAdminId       uint     `gorm:"foreignkey" json:"-"`
-	InvitedUserName      []string `gorm:"-" json:"InvitedUserName"`
-	InvitedUserEmail     []string `gorm:"-" json:"InvitedUserEmail"`
-	CollaboratorUserName []string `gorm:"-" json:"CollaboratorUserName"`
-	CollaboratorEmail    []string `gorm:"-" json:"CollaboratorEmail"`
-	ProjectAdminName     string   `gorm:"-" json:"ProjectAdminName"`
-	ProjectAdminEmail    string   `gorm:"-" json:"ProjectAdminEmail"`
+	KategoriProject  string     `gorm:"not null" json:"KategoriProject"`
+	NamaProject      string     `gorm:"not null" json:"NamaProject"`
+	TanggalMulai     string     `gorm:"not null" json:"TanggalMulai"`
+	LinkTrello       string     `gorm:"not null" json:"LinkTrello"`
+	DeskripsiProject string     `gorm:"not null" json:"DeskripsiProject"`
+	ProjectAdminId   uint       `gorm:"foreignkey" json:"-"`
+	InvitedUser      []Username `gorm:"-" json:"InvitedUser"`
+	Collaborator     []Username `gorm:"-" json:"Collaborator"`
+	ProjectAdmin     Username   `gorm:"-" json:"ProjectAdmin"`
 }
 
 type Invited struct {
@@ -50,4 +47,9 @@ type Artikel struct {
 	UserId     uint   `gorm:"foreignkey" json:"-"`
 	UserName   string `gorm:"-" json:"UserName"`
 	UserEmail  string `gorm:"-" json:"UserEmail"`
+}
+
+type Username struct {
+	NamaLengkap string
+	Email       string
 }

@@ -60,3 +60,34 @@ func GetCollaboratorUser(id uint64) (collaborator Collaborator, err error) {
 	}
 	return collaborator, err
 }
+
+func GetInvitedUsername(id uint) (username []Username, err error) {
+	db, _ := InitMigrationInv()
+	// if res.Error != nil {
+	// 	return User{}, res.Error
+	// }
+	// var invited Invited
+	db.dbConnection.Table("users").Select("users.nama_lengkap, users.email, inviteds.project_id, inviteds.deleted_at").Joins("right join inviteds on inviteds.invited_user_id = users.id").Where("project_id = ? AND inviteds.deleted_at is NULL", id).Scan(&username)
+
+	return username, nil
+}
+
+func GetCollaboratedUsername(id uint) (username []Username, err error) {
+	db, _ := InitMigrationUser()
+	// if res.Error != nil {
+	// 	return User{}, res.Error
+	// }
+	db.dbConnection.Table("users").Select("users.nama_lengkap, users.email, collaborators.project_id,collaborators.deleted_at").Joins("right join collaborators on collaborators.collaborator_user_id = users.id").Where("project_id = ? AND collaborators.deleted_at is NULL", id).Scan(&username)
+
+	return username, nil
+}
+
+func GetProjectAdmin(id uint) (username Username, err error) {
+	db, _ := InitMigrationUser()
+	// if res.Error != nil {
+	// 	return User{}, res.Error
+	// }
+	db.dbConnection.Table("users").Select("users.nama_lengkap, users.email, projects.id").Joins("right join projects on projects.project_admin_id = users.id").Where("projects.id = ?", id).Scan(&username)
+
+	return username, nil
+}
