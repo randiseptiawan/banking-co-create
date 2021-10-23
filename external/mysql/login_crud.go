@@ -54,6 +54,9 @@ func CreateUser(user *User) (err error) {
 	if err != nil {
 		return err
 	}
-	db.dbConnection.Create(user)
+	res := db.dbConnection.Create(user)
+	if res.Error != nil {
+		return res.Error
+	}
 	return nil
 }

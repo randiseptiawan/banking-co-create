@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -24,7 +23,6 @@ func CreateArtikelHandler() http.HandlerFunc {
 			return
 		}
 		json.Unmarshal(payloads, &artikel)
-		fmt.Println(payloads, artikel)
 
 		authorizationHeader := r.Header.Get("Authorization")
 		if !strings.Contains(authorizationHeader, "Bearer") {
@@ -150,7 +148,7 @@ func UpdateArtikelHandler() http.HandlerFunc {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
 		}
-        artikelUser, err := mysql.GetUserById(artikelUpdated.UserId)
+		artikelUser, err := mysql.GetUserById(artikelUpdated.UserId)
 		if err != nil {
 			responder.NewHttpResponse(r, w, http.StatusBadRequest, nil, err)
 			return
