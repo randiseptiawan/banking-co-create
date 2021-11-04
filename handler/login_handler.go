@@ -28,7 +28,7 @@ type Claims struct {
 	UserId      uint   `json:"UserId"`
 	NamaLengkap string `json:"NamaLengkap"`
 	Email       string `json:"Email"`
-	RoleStatus  string `json:"RoleStatus`
+	RoleStatus  string `json:"RoleStatus"`
 	jwt.StandardClaims
 }
 
