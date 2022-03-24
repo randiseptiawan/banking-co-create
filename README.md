@@ -56,3 +56,5 @@ make build
 | LOG_LEVEL | Mode for log level configuration | string | debug/info |
 | ENVIRONMENT | Application environment | string | development |
 | JWT_SECRET | JWT Secret | string | alphabet |
+
+Presentation Link : https://docs.google.com/presentation/d/1M9LoGMknIwqf1MlW9RFZd6ZQZlhsd9QFVfm1IyJXsIg/edit#slide=id.g25f6af9dd6_0_0
